@@ -8,45 +8,51 @@
 // https://www.youtube.com/watch?v=2ogqPWJSftE
 
 int kmp(char pattern[], char string[], const int *prefix_table) {
-  int n = strlen(string);
-  int m = strlen(pattern);
-
-  int i = 0;
-
-  int j;
-
-  int r = -1;
-  for(j = 1; j < n; j++) {
-    while (i > 0 && pattern[i+1] != string[j]) {
-      i = prefix_table[i];
+  int stringLength = strlen(string);
+  int patternLength = strlen(pattern);
+  int q = 0;
+  int i, r = -1;
+  for(i = 0; i <= stringLength; i++) {
+    // if it started to match
+    // and then stopped.
+    // tries to jump by using the prefix table.
+    while ((q > 0) && (pattern[q] != string[i])) {
+      q = prefix_table[q];
     }
-    if(pattern[i+1] == string[j]) {
-      i += 1;
+    // matches
+    if (pattern[q] == string[i]) {
+      q = q + 1;
     }
-    if (i == m - 1) {
-      r = j - m - 1;
+    // if all the letters of the pattern match.
+    if (q == patternLength) {
+      r = q;
       break;
-    };
+    }
   }
   return r;
 }
 
 int *kmp_prefix(char pattern[]) {
   int patternLength = strlen(pattern);
-  int *prefix = malloc(sizeof(int)*patternLength);
-  prefix[0] = 0;
-  int a = 0;
-  int b;
-  for(b = 1; b < patternLength;b++) {
-    while(a > 0 && pattern[a] != pattern[b]) {
-      a = prefix[a - 1];
-    };
-    if (pattern[a] == pattern[b]) {
-      a = a + 1;
+  int *prefixTable = malloc(sizeof(int)*patternLength);
+  *prefixTable = 0;
+  int q = 0; // index of last letter of current pattern substring.
+  int k = 0; // max length of a substring that is both proper prefix and suffix of the pattern substring pattern[0..q];
+  for(q = 1; q < patternLength; q++) {
+    // from the substring pattern[k..q] if we find a substring that does nt have the first letter equal to the last
+    // it means that we dont have a proper prefix that has the proper suffix. so we backtrack the substring[k..q]
+    while(k > 0 && pattern[k] != pattern[q]) {
+      k = prefixTable[k-1];
     }
-    prefix[b] = a;
-  }
-  return prefix;
+    // logic:
+    // if the first character is equal to the last. means that we have, in the substring, at least:
+    //  a proper suffix that is equal to the propper prefix.
+    if(pattern[k] == pattern[q]) {
+      k = k + 1;
+    };
+    prefixTable[q] = k;
+  };
+  return prefixTable;
 }
 
 int main() {
