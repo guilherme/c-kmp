@@ -8,11 +8,11 @@
 // https://www.youtube.com/watch?v=2ogqPWJSftE
 
 int kmp(char pattern[], char string[], const int *prefix_table) {
-  int stringLength = strlen(string);
-  int patternLength = strlen(pattern);
+  int string_length = strlen(string);
+  int pattern_length = strlen(pattern);
   int q = 0;
   int i, r = -1;
-  for(i = 0; i <= stringLength; i++) {
+  for(i = 0; i <= string_length; i++) {
     // if it started to match
     // and then stopped.
     // tries to jump by using the prefix table.
@@ -24,7 +24,7 @@ int kmp(char pattern[], char string[], const int *prefix_table) {
       q = q + 1;
     }
     // if all the letters of the pattern match.
-    if (q == patternLength) {
+    if (q == pattern_length) {
       r = q;
       break;
     }
@@ -33,16 +33,16 @@ int kmp(char pattern[], char string[], const int *prefix_table) {
 }
 
 int *kmp_prefix(char pattern[]) {
-  int patternLength = strlen(pattern);
-  int *prefixTable = malloc(sizeof(int)*patternLength);
-  *prefixTable = 0;
+  int pattern_length = strlen(pattern);
+  int *prefix_table = malloc(sizeof(int)*pattern_length);
+  prefix_table[0] = 0;
   int q = 0; // index of last letter of current pattern substring.
   int k = 0; // max length of a substring that is both proper prefix and suffix of the pattern substring pattern[0..q];
-  for(q = 1; q < patternLength; q++) {
+  for(q = 1; q < pattern_length; q++) {
     // from the substring pattern[k..q] if we find a substring that does nt have the first letter equal to the last
     // it means that we dont have a proper prefix that has the proper suffix. so we backtrack the substring[k..q]
     while(k > 0 && pattern[k] != pattern[q]) {
-      k = prefixTable[k-1];
+      k = prefix_table[k-1];
     }
     // logic:
     // if the first character is equal to the last. means that we have, in the substring, at least:
@@ -50,9 +50,9 @@ int *kmp_prefix(char pattern[]) {
     if(pattern[k] == pattern[q]) {
       k = k + 1;
     };
-    prefixTable[q] = k;
+    prefix_table[q] = k;
   };
-  return prefixTable;
+  return prefix_table;
 }
 
 int main() {
